@@ -1,7 +1,17 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.3'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'idea'
+    id 'org.springframework.experimental.aot' version '0.10.2-SNAPSHOT'
+    id 'org.graalvm.buildtools.native' version '0.9.1'
+}
+
+idea {
+    module {
+        downloadSources(true)
+        downloadJavadoc(true)
+    }
 }
 
 group = 'org.base.srping'
@@ -9,34 +19,42 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    maven { url 'https://repo.spring.io/snapshot' }
+    mavenCentral()
 }
 
 ext {
-	set('testcontainersVersion', "1.15.3")
+    set('testcontainersVersion', "1.15.3")
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-	}
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+bootBuildImage {
+    builder = 'paketobuildpacks/builder:tiny'
+    environment = ['BP_NATIVE_IMAGE': 'true']
 }
